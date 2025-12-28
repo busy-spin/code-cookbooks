@@ -11,8 +11,11 @@
 
     <artifactId>aeron-cookbooks</artifactId>
 
-    <properties>
-
-    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>io.aeron</groupId>
+            <artifactId>aeron-all</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -15,7 +15,13 @@
   </modules>
 
   <dependencyManagement>
-    <dependencies/>
+    <dependencies>
+        <dependency>
+            <groupId>io.aeron</groupId>
+            <artifactId>aeron-all</artifactId>
+            <version>1.40.0</version>
+        </dependency>
+    </dependencies>
   </dependencyManagement>
 
   <build>
