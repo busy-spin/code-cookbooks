@@ -11,6 +11,15 @@ public class FixEngineLauncher implements AppLauncher {
 
     private FixEngine fixEngine;
 
+    /*
+    this.outboundReplayStream = 3;
+    this.archiveReplayStream = 4;
+    this.reproductionLogStream = 6;
+    this.reproductionReplayStream = 7;
+    this.inboundAdminStream = 21;
+    this.outboundAdminStream = 22;
+    *
+    * */
     @Override
     public void launch() {
         EngineConfiguration configuration = new EngineConfiguration();
@@ -25,6 +34,12 @@ public class FixEngineLauncher implements AppLauncher {
                 .framerIdleStrategy(new NoOpIdleStrategy())
                 .monitoringThreadIdleStrategy(new NoOpIdleStrategy())
                 .archiverIdleStrategy(new NoOpIdleStrategy())
+                .outboundReplayStream(Integer.getInteger("artio.outbound.replay.stream"))
+                .archiveReplayStream(Integer.getInteger("artio.archive.replay.stream"))
+                .reproductionLogStream(Integer.getInteger("artio.reproduction.log.stream"))
+                .reproductionReplayStream(Integer.getInteger("artio.reproduction.replay.stream"))
+                .inboundAdminStream(Integer.getInteger("artio.inbound.admin.stream"))
+                .outboundAdminStream(Integer.getInteger("artio.outbound.admin.stream"))
                 .printAeronStreamIdentifiers(true);
 
         fixEngine = FixEngine.launch(configuration);

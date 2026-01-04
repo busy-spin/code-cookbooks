@@ -6,7 +6,7 @@ After=network.target
 User=artio
 WorkingDirectory=/opt/apps/
 EnvironmentFile=/opt/apps/env/%i.env
-ExecStart=/bin/bash -c 'exec taskset -c ${CPU_AFFINITY} /usr/bin/java ${JAVA_OPTS} --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/jdk.internal.misc=ALL-UNNAMED -jar /opt/apps/artio-cookbook.jar'
+ExecStart=/bin/bash -c 'exec taskset -c ${CPU_AFFINITY} /usr/bin/java ${JAVA_OPTS} --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/jdk.internal.misc=ALL-UNNAMED -jar /opt/apps/artio-cookbook.jar --instance-id=%i'
 SuccessExitStatus=143
 Restart=always
 RestartSec=5
