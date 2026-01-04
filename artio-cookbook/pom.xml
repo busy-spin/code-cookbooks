@@ -25,6 +25,11 @@
 
         <dependency>
             <groupId>uk.co.real-logic</groupId>
+            <artifactId>artio-session-codecs</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.co.real-logic</groupId>
             <artifactId>artio-core</artifactId>
         </dependency>
 
