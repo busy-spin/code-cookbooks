@@ -11,15 +11,6 @@ public class FixEngineLauncher implements AppLauncher {
 
     private FixEngine fixEngine;
 
-    /*
-    this.outboundReplayStream = 3;
-    this.archiveReplayStream = 4;
-    this.reproductionLogStream = 6;
-    this.reproductionReplayStream = 7;
-    this.inboundAdminStream = 21;
-    this.outboundAdminStream = 22;
-    *
-    * */
     @Override
     public void launch() {
         EngineConfiguration configuration = new EngineConfiguration();
@@ -30,6 +21,7 @@ public class FixEngineLauncher implements AppLauncher {
                 .logFileDir(System.getProperty("artio.logs.dir"))
                 .logInboundMessages(false)
                 .logOutboundMessages(false)
+                .deleteLogFileDirOnStart(true)
                 .threadFactory(ThreadFactoryUtils.newDeamonThreadFactory())
                 .framerIdleStrategy(new NoOpIdleStrategy())
                 .monitoringThreadIdleStrategy(new NoOpIdleStrategy())
