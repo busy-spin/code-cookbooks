@@ -2,7 +2,6 @@ package io.github.busy_spin.artio.media_driver;
 
 import io.aeron.driver.MediaDriver;
 import io.github.busy_spin.artio.AppLauncher;
-import io.github.busy_spin.artio.AppLauncherUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
