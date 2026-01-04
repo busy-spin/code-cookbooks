@@ -1,0 +1,17 @@
+[Unit]
+Description=Aeron-Artio Exp (%i)
+After=network.target
+
+[Service]
+User=artio
+WorkingDirectory=/opt/apps/%i
+EnvironmentFile=/opt/apps/%i/.env
+ExecStart=/bin/bash -c '/usr/bin/java ${JAVA_OPTS} -jar ${JAR_NAME}'
+SuccessExitStatus=143
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
