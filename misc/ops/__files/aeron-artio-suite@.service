@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 User=artio
-WorkingDirectory=/opt/apps/%i
-EnvironmentFile=/opt/apps/%i/.env
-ExecStart=/bin/bash -c '/usr/bin/java ${JAVA_OPTS} --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/jdk.internal.misc=ALL-UNNAMED -jar /opt/apps/artio-demo.jar'
+WorkingDirectory=/opt/apps/
+EnvironmentFile=/opt/apps/env/%i.env
+ExecStart=/bin/bash -c '/usr/bin/java ${JAVA_OPTS} --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/jdk.internal.misc=ALL-UNNAMED -jar /opt/apps/artio-cookbook.jar'
 SuccessExitStatus=143
 Restart=always
 RestartSec=5

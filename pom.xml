@@ -107,7 +107,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>artio-demo</finalName>
+        <finalName>${artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
