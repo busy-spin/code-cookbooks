@@ -19,7 +19,7 @@ public class FixInitiatorLauncher implements AppLauncher {
         configuration.threadFactory(ThreadFactoryUtils.newDeamonThreadFactory());
         configuration.sessionExistsHandler(new AcquiringSessionExistsHandler())
                 .libraryAeronChannels(Collections.singletonList(Aeron.Context.IPC_CHANNEL))
-                .sessionAcquireHandler()
+                .sessionAcquireHandler(new FixTestRequestHandler())
         ;
         fixLibrary = FixLibrary.connect(configuration);
     }

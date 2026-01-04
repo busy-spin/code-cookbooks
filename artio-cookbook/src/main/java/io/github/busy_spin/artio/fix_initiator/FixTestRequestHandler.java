@@ -4,26 +4,39 @@ import io.aeron.logbuffer.ControlledFragmentHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.HdrHistogram.Histogram;
 import org.agrona.DirectBuffer;
+import uk.co.real_logic.artio.Reply;
 import uk.co.real_logic.artio.decoder.HeartbeatDecoder;
 import uk.co.real_logic.artio.library.FixLibrary;
 import uk.co.real_logic.artio.library.LibraryConnectHandler;
 import uk.co.real_logic.artio.library.OnMessageInfo;
+import uk.co.real_logic.artio.library.SessionAcquireHandler;
+import uk.co.real_logic.artio.library.SessionAcquiredInfo;
+import uk.co.real_logic.artio.library.SessionConfiguration;
 import uk.co.real_logic.artio.library.SessionHandler;
 import uk.co.real_logic.artio.messages.DisconnectReason;
 import uk.co.real_logic.artio.session.CompositeKey;
 import uk.co.real_logic.artio.session.Session;
 import uk.co.real_logic.artio.util.MutableAsciiBuffer;
 
+import static uk.co.real_logic.artio.Reply.State.ERRORED;
+
 @Slf4j
-public class FixTestRequestHandler implements SessionHandler, LibraryConnectHandler {
+public class FixTestRequestHandler implements SessionHandler, LibraryConnectHandler, SessionAcquireHandler {
 
     private final MutableAsciiBuffer asciiBuffer = new MutableAsciiBuffer();
     private final HeartbeatDecoder heartbeatDecoder = new HeartbeatDecoder();
 
     private final Histogram histogram = new Histogram(3);
 
+    private FixLibrary fixLibrary;
+
+    private Reply<Session> reply = errorReply();
+
+    private Session session = null;
+
     @Override
     public void onConnect(FixLibrary fixLibrary) {
+        this.fixLibrary = fixLibrary;
         log.info("Connected to fix engine");
     }
 
@@ -63,12 +76,24 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     }
 
     public void tryConnect() {
-
+        if (fixLibrary.isConnected()) {
+            if (reply != null && reply.hasErrored()) {
+                SessionConfiguration sessionConfig = SessionConfiguration.builder()
+                        .senderCompId(System.getProperty("artio.sender.comp.id"))
+                        .targetCompId(System.getProperty("artio.target.comp.id"))
+                        .address(System.getProperty("artio.host"), Integer.getInteger("artio.port"))
+                        .build();
+                reply = fixLibrary.initiate(sessionConfig);
+            } else if (reply != null &&  reply.hasCompleted()) {
+                reply = null;
+            }
+        }
     }
 
     @Override
     public void onTimeout(int libraryId, Session session) {
         log.info("Session timed out");
+        reply = errorReply();
     }
 
     @Override
@@ -82,7 +107,11 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     }
 
     @Override
-    public ControlledFragmentHandler.Action onDisconnect(int libraryId, Session session, DisconnectReason disconnectReason) {
+    public ControlledFragmentHandler.Action onDisconnect(int libraryId,
+                                                         Session session,
+                                                         DisconnectReason disconnectReason) {
+        log.info("Session disconnected");
+        reply = errorReply();
         return ControlledFragmentHandler.Action.CONTINUE;
     }
 
@@ -90,5 +119,31 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     public void onSessionStart(Session session) {
         CompositeKey key = session.compositeKey();
         log.info("Session started {} {} -> {}", session.beginString(), key.localCompId(), key.remoteCompId());
+    }
+
+    @Override
+    public SessionHandler onSessionAcquired(Session session, SessionAcquiredInfo sessionAcquiredInfo) {
+        log.info("Session acquired {}", sessionAcquiredInfo);
+        this.session = session;
+        return this;
+    }
+
+    private static Reply<Session> errorReply() {
+        return new Reply<>() {
+            @Override
+            public Throwable error() {
+                return null;
+            }
+
+            @Override
+            public Session resultIfPresent() {
+                return null;
+            }
+
+            @Override
+            public State state() {
+                return ERRORED;
+            }
+        };
     }
 }
