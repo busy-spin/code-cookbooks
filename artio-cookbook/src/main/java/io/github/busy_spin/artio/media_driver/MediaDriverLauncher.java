@@ -8,12 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MediaDriverLauncher implements AppLauncher {
 
-    MediaDriver mediaDriver;
-
-    @Override
-    public String id() {
-        return AppLauncherUtils.MEDIA_DRIVER_APP_ID;
-    }
+    private MediaDriver mediaDriver;
 
     @Override
     public void launch() {
