@@ -17,10 +17,13 @@ public class FixInitiatorLauncher implements AppLauncher {
     public void launch() {
         LibraryConfiguration configuration = new LibraryConfiguration();
         configuration.threadFactory(ThreadFactoryUtils.newDeamonThreadFactory());
+        FixTestRequestHandler handler = new FixTestRequestHandler();
         configuration.sessionExistsHandler(new AcquiringSessionExistsHandler())
                 .libraryAeronChannels(Collections.singletonList(Aeron.Context.IPC_CHANNEL))
-                .sessionAcquireHandler(new FixTestRequestHandler())
-        ;
+                .sessionAcquireHandler(handler)
+                .libraryConnectHandler(handler)
+                .inboundLibraryStream(Integer.getInteger("artio.inbound.library.stream"))
+                .outboundLibraryStream(Integer.getInteger("artio.outbound.library.stream"));
         fixLibrary = FixLibrary.connect(configuration);
     }
 
