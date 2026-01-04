@@ -45,7 +45,7 @@ status_app() {
 
 logs_app() {
   echo "📄 Tailing systemd logs for $SERVICE_UNIT:"
-  tail -f $APP_DIR/logs/app.log
+  sudo journalctl -u $SERVICE_UNIT -n 200 -f
 }
 
 enable_app() {
