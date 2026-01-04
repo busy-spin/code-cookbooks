@@ -60,6 +60,18 @@ disable_app() {
   echo "✅ $SERVICE_UNIT is disabled and will not start on reboot."
 }
 
+register_app() {
+  echo "🛠 Registering instance: $INSTANCE_ID ($PROCESS_NAME)"
+  echo "📄 Installing systemd service template... ${SERVICE_TEMPLATE}"
+  sudo systemctl daemon-reload
+
+  echo "✅ Enabling service..."
+  sudo systemctl enable "$SERVICE_UNIT"
+
+  echo "✅ Restarting service..."
+  restart_app
+}
+
 print_help() {
   echo "Usage: actl <command> <process> <instance>"
   echo "Commands:"
@@ -100,8 +112,11 @@ case "$1" in
   enable)
     enable_app
     ;;
+  register)
+    register_app
+    ;;
   *)
-    echo "❌ Unknown command: $1 (allowed: start, stop, restart, status, logs, disable, enable)"
+    echo "❌ Unknown command: $1 (allowed: start, stop, restart, status, logs, disable, enable, register)"
     exit 1
     ;;
 esac
