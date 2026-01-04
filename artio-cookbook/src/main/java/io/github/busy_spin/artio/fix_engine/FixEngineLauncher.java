@@ -40,6 +40,8 @@ public class FixEngineLauncher implements AppLauncher {
                 .reproductionReplayStream(Integer.getInteger("artio.reproduction.replay.stream"))
                 .inboundAdminStream(Integer.getInteger("artio.inbound.admin.stream"))
                 .outboundAdminStream(Integer.getInteger("artio.outbound.admin.stream"))
+                .inboundLibraryStream(Integer.getInteger("artio.inbound.library.stream"))
+                .outboundLibraryStream(Integer.getInteger("artio.outbound.library.stream"))
                 .printAeronStreamIdentifiers(true);
 
         fixEngine = FixEngine.launch(configuration);
