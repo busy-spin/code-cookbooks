@@ -2,6 +2,7 @@ package io.github.busy_spin.artio;
 
 import io.github.busy_spin.artio.fix_engine.FixEngineLauncher;
 import io.github.busy_spin.artio.media_driver.MediaDriverLauncher;
+import io.github.busy_spin.artio.utils.EnvToProps;
 import lombok.extern.slf4j.Slf4j;
 import org.agrona.concurrent.ShutdownSignalBarrier;
 
@@ -13,6 +14,7 @@ public class MainApp {
 
     public static void main(String[] args) {
         try (ShutdownSignalBarrier barrier = new ShutdownSignalBarrier()) {
+            EnvToProps.loadPropsFromEnv();
             String appId = System.getenv("APP_ID");
             AppLauncher launcher = switch (appId) {
                 case MEDIA_DRIVER_APP_ID -> new MediaDriverLauncher();

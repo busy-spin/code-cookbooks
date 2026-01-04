@@ -18,6 +18,16 @@
             <artifactId>aeron-all</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>uk.co.real-logic</groupId>
+            <artifactId>artio-codecs</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.co.real-logic</groupId>
+            <artifactId>artio-core</artifactId>
+        </dependency>
+
         <!-- utils -->
 
         <dependency>
