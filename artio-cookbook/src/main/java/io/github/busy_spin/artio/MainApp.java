@@ -9,24 +9,22 @@ public class MainApp {
 
     public static void main(String[] args) {
         try (ShutdownSignalBarrier barrier = new ShutdownSignalBarrier()) {
-            if (args.length != 1) {
-                log.error("Invalid number of parameters");
-            } else {
-                AppLauncher launcher = null;
-                if (args[0].equals(AppLauncherUtils.MEDIA_DRIVER_APP_ID)) {
-                    launcher = new MediaDriverLauncher();
-                    launcher.launch();
-                }
+            String appId = System.getenv("APP_ID");
+            AppLauncher launcher = null;
+            if (AppLauncherUtils.MEDIA_DRIVER_APP_ID.equals(appId)) {
+                launcher = new MediaDriverLauncher();
+                launcher.launch();
+            }
 
+            if (launcher != null) {
                 barrier.await();
-
-                if (launcher != null) {
-                    try {
-                        launcher.close();
-                    } catch (Exception e) {
-                        log.error("Error closing launcher", e);
-                    }
+                try {
+                    launcher.close();
+                } catch (Exception e) {
+                    log.error("Error closing launcher", e);
                 }
+            } else {
+                log.error("AppLauncher not found");
             }
         } finally {
             log.info("MainApp shutdown signal");

@@ -4,8 +4,7 @@ PROCESS_NAME="$2"
 INSTANCE_ID="$3"
 
 SERVICE_UNIT="aero-artio-suite@${PROCESS_NAME}-${INSTANCE_ID}.service"
-APP_DIR="/opt/apps/demo-${INSTANCE_ID}"
-JAR_FILE="${APP_DIR}/${PROCESS_NAME}.jar"
+APP_DIR="/opt/apps/${PROCESS_NAME}-${INSTANCE_ID}"
 SERVICE_TEMPLATE="/etc/systemd/system/aero-artio-suite@.service"
 
 # Validate input
