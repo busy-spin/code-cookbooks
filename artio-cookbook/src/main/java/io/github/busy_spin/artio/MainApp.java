@@ -16,7 +16,7 @@ public class MainApp {
 
     public static void main(String[] args) {
         try (ShutdownSignalBarrier barrier = new ShutdownSignalBarrier()) {
-            EnvToProps.loadPropsFromEnv();
+            EnvToProps.initialize();
             String appId = System.getenv("APP_ID");
             AppLauncher launcher = switch (appId) {
                 case MEDIA_DRIVER_APP_ID -> new MediaDriverLauncher();
