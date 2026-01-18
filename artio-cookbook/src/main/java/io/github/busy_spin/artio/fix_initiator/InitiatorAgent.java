@@ -18,7 +18,9 @@ public class InitiatorAgent implements Agent {
 
     private final int connectInternalMs = 5_000;
     private final int reqPerMs = Integer.getInteger("artio.request.per.ms");
+    private long reqCounter = 0;
 
+    private final FixTestRequestHandler handler = new FixTestRequestHandler();
     private FixLibrary fixLibrary;
 
     public InitiatorAgent() {
@@ -27,8 +29,6 @@ public class InitiatorAgent implements Agent {
     @Override
     public void onStart() {
         log.info("Agent {} has started", roleName());
-
-        FixTestRequestHandler handler = new FixTestRequestHandler();
 
         LibraryConfiguration configuration = new LibraryConfiguration();
         configuration.threadFactory(ThreadFactoryUtils.newDeamonThreadFactory());
@@ -44,6 +44,22 @@ public class InitiatorAgent implements Agent {
     @Override
     public int doWork() throws Exception {
         fixLibrary.poll(10);
+        long currentTimeMs = System.currentTimeMillis();
+        if (lastConnectAttemptTime + connectInternalMs < currentTimeMs) {
+            handler.tryConnect();
+        }
+        if (lastReqSendTime == currentTimeMs) {
+            handler.sendTestReq();
+            if (reqCounter < reqPerMs) {
+                handler.sendTestReq();
+                reqCounter++;
+            }
+        } else {
+            lastReqSendTime = currentTimeMs;
+            reqCounter = 0;
+        }
+
+
         return 1;
     }
 

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.HdrHistogram.Histogram;
 import org.agrona.DirectBuffer;
 import uk.co.real_logic.artio.Reply;
+import uk.co.real_logic.artio.builder.TestRequestEncoder;
 import uk.co.real_logic.artio.decoder.HeartbeatDecoder;
 import uk.co.real_logic.artio.library.FixLibrary;
 import uk.co.real_logic.artio.library.LibraryConnectHandler;
@@ -26,6 +27,8 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     private final MutableAsciiBuffer asciiBuffer = new MutableAsciiBuffer();
     private final HeartbeatDecoder heartbeatDecoder = new HeartbeatDecoder();
 
+    private final TestRequestEncoder testRequestEncoder = new TestRequestEncoder();
+
     private final Histogram histogram = new Histogram(3);
 
     private FixLibrary fixLibrary;
@@ -42,6 +45,7 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
 
     @Override
     public void onDisconnect(FixLibrary fixLibrary) {
+        session = null;
         log.info("Disconnected from fix engine");
     }
 
@@ -59,6 +63,7 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
             OnMessageInfo messageInfo) {
         asciiBuffer.wrap(buffer, offset, length);
         if (messageType == HeartbeatDecoder.MESSAGE_TYPE) {
+            log.info("Heart beat received !!!");
             heartbeatDecoder.decode(asciiBuffer, 0, length);
             if (heartbeatDecoder.hasTestReqID()) {
                 String testReqId = heartbeatDecoder.testReqIDAsString();
@@ -76,7 +81,7 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     }
 
     public void tryConnect() {
-        if (fixLibrary.isConnected()) {
+        if (fixLibrary != null && fixLibrary.isConnected()) {
             if (reply != null && reply.hasErrored()) {
                 SessionConfiguration sessionConfig = SessionConfiguration.builder()
                         .senderCompId(System.getProperty("artio.sender.comp.id"))
@@ -87,6 +92,12 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
             } else if (reply != null &&  reply.hasCompleted()) {
                 reply = null;
             }
+        }
+    }
+
+    public void sendTestReq() {
+        if (session != null) {
+            testRequestEncoder.testReqID(String.valueOf(System.currentTimeMillis()).toCharArray());
         }
     }
 
@@ -112,18 +123,20 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
                                                          DisconnectReason disconnectReason) {
         log.info("Session disconnected");
         reply = errorReply();
+        session = null;
         return ControlledFragmentHandler.Action.CONTINUE;
     }
 
     @Override
     public void onSessionStart(Session session) {
+        session = session;
         CompositeKey key = session.compositeKey();
         log.info("Session started {} {} -> {}", session.beginString(), key.localCompId(), key.remoteCompId());
     }
 
     @Override
     public SessionHandler onSessionAcquired(Session session, SessionAcquiredInfo sessionAcquiredInfo) {
-        log.info("Session acquired {}", sessionAcquiredInfo);
+        log.info("Session acquired {}", sessionAcquiredInfo.metaDataStatus());
         this.session = session;
         return this;
     }
