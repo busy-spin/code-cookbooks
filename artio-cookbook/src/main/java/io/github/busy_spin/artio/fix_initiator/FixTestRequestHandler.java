@@ -80,6 +80,9 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     }
 
     public void tryConnect() {
+        if (session != null) {
+            return;
+        }
         if (fixLibrary != null && fixLibrary.isConnected()) {
             if (reply != null && reply.hasErrored()) {
                 SessionConfiguration sessionConfig = SessionConfiguration.builder()
