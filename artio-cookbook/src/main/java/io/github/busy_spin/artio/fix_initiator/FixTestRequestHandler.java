@@ -13,6 +13,7 @@ import uk.co.real_logic.artio.library.OnMessageInfo;
 import uk.co.real_logic.artio.library.SessionAcquireHandler;
 import uk.co.real_logic.artio.library.SessionAcquiredInfo;
 import uk.co.real_logic.artio.library.SessionConfiguration;
+import uk.co.real_logic.artio.library.SessionExistsHandler;
 import uk.co.real_logic.artio.library.SessionHandler;
 import uk.co.real_logic.artio.messages.DisconnectReason;
 import uk.co.real_logic.artio.session.CompositeKey;
@@ -22,7 +23,7 @@ import uk.co.real_logic.artio.util.MutableAsciiBuffer;
 import static uk.co.real_logic.artio.Reply.State.ERRORED;
 
 @Slf4j
-public class FixTestRequestHandler implements SessionHandler, LibraryConnectHandler, SessionAcquireHandler {
+public class FixTestRequestHandler implements SessionHandler, LibraryConnectHandler, SessionAcquireHandler, SessionExistsHandler {
 
     private final MutableAsciiBuffer asciiBuffer = new MutableAsciiBuffer();
     private final HeartbeatDecoder heartbeatDecoder = new HeartbeatDecoder();
@@ -36,6 +37,14 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     private Reply<Session> reply = errorReply();
 
     private Session session = null;
+
+    private final String senderCompId;
+    private final String targetCompId;
+
+    public FixTestRequestHandler(String senderCompId, String targetCompId) {
+        this.senderCompId = senderCompId;
+        this.targetCompId = targetCompId;
+    }
 
     @Override
     public void onConnect(FixLibrary fixLibrary) {
@@ -84,8 +93,8 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
         if (fixLibrary != null && fixLibrary.isConnected()) {
             if (reply != null && reply.hasErrored()) {
                 SessionConfiguration sessionConfig = SessionConfiguration.builder()
-                        .senderCompId(System.getProperty("artio.sender.comp.id"))
-                        .targetCompId(System.getProperty("artio.target.comp.id"))
+                        .senderCompId(senderCompId)
+                        .targetCompId(targetCompId)
                         .address(System.getProperty("artio.host"), Integer.getInteger("artio.port"))
                         .build();
                 reply = fixLibrary.initiate(sessionConfig);
@@ -154,6 +163,21 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
         return this;
     }
 
+    @Override
+    public void onSessionExists(
+            FixLibrary library,
+            long surrogateSessionId,
+            String localCompId,
+            String localSubId,
+            String localLocationId,
+            String remoteCompId,
+            String remoteSubId,
+            String remoteLocationId,
+            int logonReceivedSequenceNumber,
+            int logonSequenceIndex) {
+
+    }
+
     private static Reply<Session> errorReply() {
         return new Reply<>() {
             @Override
@@ -172,4 +196,5 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
             }
         };
     }
+
 }

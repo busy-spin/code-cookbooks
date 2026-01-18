@@ -4,7 +4,6 @@ import io.aeron.Aeron;
 import io.github.busy_spin.artio.utils.ThreadFactoryUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.agrona.concurrent.Agent;
-import uk.co.real_logic.artio.library.AcquiringSessionExistsHandler;
 import uk.co.real_logic.artio.library.FixLibrary;
 import uk.co.real_logic.artio.library.LibraryConfiguration;
 
@@ -20,7 +19,7 @@ public class InitiatorAgent implements Agent {
     private final int reqPerMs = Integer.getInteger("artio.request.per.ms");
     private long reqCounter = 0;
 
-    private final FixTestRequestHandler handler = new FixTestRequestHandler();
+    private FixTestRequestHandler handler;
     private FixLibrary fixLibrary;
 
     public InitiatorAgent() {
@@ -30,9 +29,13 @@ public class InitiatorAgent implements Agent {
     public void onStart() {
         log.info("Agent {} has started", roleName());
 
+        String senderCompId = System.getProperty("artio.sender.comp.id");
+        String targetCompId = System.getProperty("artio.target.comp.id");
+        handler = new FixTestRequestHandler(senderCompId, targetCompId);
+
         LibraryConfiguration configuration = new LibraryConfiguration();
         configuration.threadFactory(ThreadFactoryUtils.newDeamonThreadFactory());
-        configuration.sessionExistsHandler(new AcquiringSessionExistsHandler())
+        configuration.sessionExistsHandler(handler)
                 .libraryAeronChannels(Collections.singletonList(Aeron.Context.IPC_CHANNEL))
                 .sessionAcquireHandler(handler)
                 .libraryConnectHandler(handler)
