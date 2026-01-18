@@ -137,7 +137,7 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
 
     @Override
     public void onSessionStart(Session session) {
-        session = session;
+        this.session = session;
         CompositeKey key = session.compositeKey();
         log.info("Session started {} {} -> {}", session.beginString(), key.localCompId(), key.remoteCompId());
     }
@@ -145,7 +145,6 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     @Override
     public SessionHandler onSessionAcquired(Session session, SessionAcquiredInfo sessionAcquiredInfo) {
         log.info("Session acquired {}", sessionAcquiredInfo.metaDataStatus());
-        this.session = session;
         return this;
     }
 
