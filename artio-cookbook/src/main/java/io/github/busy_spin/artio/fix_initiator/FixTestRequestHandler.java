@@ -80,9 +80,6 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     }
 
     public void tryConnect() {
-        if (session != null) {
-            return;
-        }
         if (fixLibrary != null && fixLibrary.isConnected()) {
             if (reply != null && reply.hasErrored()) {
                 SessionConfiguration sessionConfig = SessionConfiguration.builder()
@@ -107,6 +104,9 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     }
 
     public void sendTestReq() {
+        if (reply != null) {
+            return;
+        }
         if (session != null && session.isConnected()) {
             testRequestEncoder.testReqID(String.valueOf(System.currentTimeMillis()).toCharArray());
             session.trySend(testRequestEncoder);
