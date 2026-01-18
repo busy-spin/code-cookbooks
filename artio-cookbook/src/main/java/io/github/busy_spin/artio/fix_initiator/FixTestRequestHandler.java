@@ -175,7 +175,13 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
             String remoteLocationId,
             int logonReceivedSequenceNumber,
             int logonSequenceIndex) {
-
+        if (senderCompId.equals(localCompId) && targetCompId.equals(remoteCompId)) {
+            log.info("Session already exists, requesting the session");
+            library.requestSession(surrogateSessionId,
+                    FixLibrary.NO_MESSAGE_REPLAY,
+                    FixLibrary.NO_MESSAGE_REPLAY,
+                    10_000);
+        }
     }
 
     private static Reply<Session> errorReply() {

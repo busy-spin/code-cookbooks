@@ -46,6 +46,12 @@ public class InitiatorAgent implements Agent {
 
     @Override
     public int doWork() throws Exception {
+        if (fixLibrary.isAtEndOfDay()) {
+            return 0;
+        }
+        if (fixLibrary.isClosed()) {
+            log.info("FixLibrary is closed");
+        }
         fixLibrary.poll(10);
         long currentTimeMs = System.currentTimeMillis();
         if (lastConnectAttemptTime + hosueKeepIntervalMs < currentTimeMs) {
