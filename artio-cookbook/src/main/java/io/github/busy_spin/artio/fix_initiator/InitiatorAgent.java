@@ -51,7 +51,6 @@ public class InitiatorAgent implements Agent {
             lastConnectAttemptTime = currentTimeMs;
         }
         if (lastReqSendTime == currentTimeMs) {
-            handler.sendTestReq();
             if (reqCounter < reqPerMs) {
                 handler.sendTestReq();
                 reqCounter++;
