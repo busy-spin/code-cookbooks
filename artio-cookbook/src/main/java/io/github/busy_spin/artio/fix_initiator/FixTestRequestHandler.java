@@ -46,6 +46,7 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     @Override
     public void onDisconnect(FixLibrary fixLibrary) {
         this.session = null;
+        this.reply = errorReply();
         log.info("Disconnected from fix engine");
     }
 
