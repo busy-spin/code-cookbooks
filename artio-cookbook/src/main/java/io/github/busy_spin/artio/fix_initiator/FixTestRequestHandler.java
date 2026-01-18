@@ -95,7 +95,7 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     }
 
     public void printAndResetCounters() {
-        log.info("p99.9 {},      p99.99 {},         p100 {}, counter {}",
+        log.info("\np99.9 = {}\np99.99 = {}\np100 = {}\ncounter {}",
                 histogram.getValueAtPercentile(99.9),
                 histogram.getValueAtPercentile(99.99),
                 histogram.getValueAtPercentile(100), histogram.getTotalCount());
