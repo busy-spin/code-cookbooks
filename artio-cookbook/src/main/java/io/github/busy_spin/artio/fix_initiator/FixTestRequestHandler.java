@@ -55,7 +55,7 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     @Override
     public void onDisconnect(FixLibrary fixLibrary) {
         log.info("Disconnected from fix engine");
-        this.session = null;
+        this.reply = errorReply();
     }
 
     @Override
@@ -90,6 +90,7 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
 
     public void maintainFixSessions() {
         if (fixLibrary != null && fixLibrary.isConnected()) {
+            log.info("Fix library is connected, reply is {}", reply);
             if (reply != null && reply.hasErrored()) {
                 SessionConfiguration sessionConfig = SessionConfiguration.builder()
                         .senderCompId(senderCompId)
@@ -100,6 +101,8 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
             } else if (reply != null &&  reply.hasCompleted()) {
                 reply = null;
             }
+        } else {
+            log.info("Fix library is disconnected");
         }
     }
 
@@ -113,7 +116,7 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     }
 
     public void sendTestReq() {
-        if (session != null && session.isConnected()) {
+        if (reply == null) {
             testRequestEncoder.testReqID(String.valueOf(System.currentTimeMillis()).toCharArray());
             session.trySend(testRequestEncoder);
         }
@@ -123,7 +126,6 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     public void onTimeout(int libraryId, Session session) {
         log.info("Session timed out");
         reply = errorReply();
-        this.session = null;
     }
 
     @Override
@@ -142,13 +144,13 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
                                                          DisconnectReason disconnectReason) {
         log.info("Session disconnected");
         reply = errorReply();
-        this.session = null;
         return ControlledFragmentHandler.Action.CONTINUE;
     }
 
     @Override
     public void onSessionStart(Session session) {
         this.session = session;
+        this.reply = null;
         CompositeKey key = session.compositeKey();
         log.info("Session started {} {} -> {}", session.beginString(), key.localCompId(), key.remoteCompId());
     }
@@ -156,6 +158,7 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     @Override
     public SessionHandler onSessionAcquired(Session session, SessionAcquiredInfo sessionAcquiredInfo) {
         this.session = session;
+        this.reply = null;
         log.info("Session acquired {}", sessionAcquiredInfo.metaDataStatus());
         return this;
     }
