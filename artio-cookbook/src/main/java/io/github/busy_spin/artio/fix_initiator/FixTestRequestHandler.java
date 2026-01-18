@@ -101,7 +101,8 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
         log.info("p99.9 = {} | p99.99 = {} | p100 = {} | counter {}",
                 histogram.getValueAtPercentile(99.9),
                 histogram.getValueAtPercentile(99.99),
-                histogram.getValueAtPercentile(100), histogram.getTotalCount());
+                histogram.getValueAtPercentile(100),
+                histogram.getTotalCount());
         histogram.reset();
     }
 
