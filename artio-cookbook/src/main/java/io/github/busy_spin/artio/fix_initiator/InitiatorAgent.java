@@ -55,7 +55,7 @@ public class InitiatorAgent implements Agent {
         fixLibrary.poll(10);
         long currentTimeMs = System.currentTimeMillis();
         if (lastConnectAttemptTime + hosueKeepIntervalMs < currentTimeMs) {
-            handler.tryConnect();
+            handler.maintainFixSessions();
             handler.printAndResetCounters();
             lastConnectAttemptTime = currentTimeMs;
         }

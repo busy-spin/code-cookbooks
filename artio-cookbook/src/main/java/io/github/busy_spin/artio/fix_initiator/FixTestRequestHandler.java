@@ -54,9 +54,8 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
 
     @Override
     public void onDisconnect(FixLibrary fixLibrary) {
-        this.session = null;
-        this.reply = errorReply();
         log.info("Disconnected from fix engine");
+        this.session = null;
     }
 
     @Override
@@ -89,7 +88,7 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
         return ControlledFragmentHandler.Action.CONTINUE;
     }
 
-    public void tryConnect() {
+    public void maintainFixSessions() {
         if (fixLibrary != null && fixLibrary.isConnected()) {
             if (reply != null && reply.hasErrored()) {
                 SessionConfiguration sessionConfig = SessionConfiguration.builder()
