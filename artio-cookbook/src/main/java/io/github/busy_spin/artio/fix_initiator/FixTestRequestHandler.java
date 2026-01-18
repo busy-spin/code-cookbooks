@@ -96,8 +96,9 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     }
 
     public void sendTestReq() {
-        if (session != null) {
+        if (session != null && session.isConnected()) {
             testRequestEncoder.testReqID(String.valueOf(System.currentTimeMillis()).toCharArray());
+            session.trySend(testRequestEncoder);
         }
     }
 
