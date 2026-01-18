@@ -15,7 +15,7 @@ fi
 
 # Validate process name
 case "$PROCESS_NAME" in
-  md|fe) ;;
+  md|fe|fi) ;;
   *) echo "❌ Invalid process name: $PROCESS_NAME (allowed: md - media driver, fe - fix engine)"; exit 1 ;;
 esac
 
