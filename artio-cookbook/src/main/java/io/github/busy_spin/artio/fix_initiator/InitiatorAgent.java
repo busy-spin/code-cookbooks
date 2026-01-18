@@ -1,7 +1,14 @@
 package io.github.busy_spin.artio.fix_initiator;
 
+import io.aeron.Aeron;
+import io.github.busy_spin.artio.utils.ThreadFactoryUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.agrona.concurrent.Agent;
+import uk.co.real_logic.artio.library.AcquiringSessionExistsHandler;
+import uk.co.real_logic.artio.library.FixLibrary;
+import uk.co.real_logic.artio.library.LibraryConfiguration;
+
+import java.util.Collections;
 
 @Slf4j
 public class InitiatorAgent implements Agent {
@@ -11,21 +18,33 @@ public class InitiatorAgent implements Agent {
 
     private final int connectInternalMs = 5_000;
     private final int reqPerMs = Integer.getInteger("artio.request.per.ms");
-    private final FixTestRequestHandler fixTestRequestHandler;
 
-    public InitiatorAgent(FixTestRequestHandler fixTestRequestHandler) {
-        this.fixTestRequestHandler = fixTestRequestHandler;
+    private FixLibrary fixLibrary;
+
+    public InitiatorAgent() {
     }
 
     @Override
     public void onStart() {
         log.info("Agent {} has started", roleName());
+
+        FixTestRequestHandler handler = new FixTestRequestHandler();
+
+        LibraryConfiguration configuration = new LibraryConfiguration();
+        configuration.threadFactory(ThreadFactoryUtils.newDeamonThreadFactory());
+        configuration.sessionExistsHandler(new AcquiringSessionExistsHandler())
+                .libraryAeronChannels(Collections.singletonList(Aeron.Context.IPC_CHANNEL))
+                .sessionAcquireHandler(handler)
+                .libraryConnectHandler(handler)
+                .inboundLibraryStream(Integer.getInteger("artio.inbound.library.stream"))
+                .outboundLibraryStream(Integer.getInteger("artio.outbound.library.stream"));
+        fixLibrary = FixLibrary.connect(configuration);
     }
 
     @Override
     public int doWork() throws Exception {
-
-        return 0;
+        fixLibrary.poll(10);
+        return 1;
     }
 
     @Override
