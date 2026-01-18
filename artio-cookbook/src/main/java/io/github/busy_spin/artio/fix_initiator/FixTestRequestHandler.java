@@ -63,13 +63,12 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
             OnMessageInfo messageInfo) {
         asciiBuffer.wrap(buffer, offset, length);
         if (messageType == HeartbeatDecoder.MESSAGE_TYPE) {
-            log.info("Heart beat received !!!");
             heartbeatDecoder.decode(asciiBuffer, 0, length);
             if (heartbeatDecoder.hasTestReqID()) {
                 String testReqId = heartbeatDecoder.testReqIDAsString();
                 long value = Long.parseLong(testReqId);
                 long delay = System.currentTimeMillis() - value;
-                if (delay < 0) {
+                if (delay > 0) {
                     histogram.recordValue(delay);
                 } else {
                     histogram.recordValue(0);
@@ -93,6 +92,14 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
                 reply = null;
             }
         }
+    }
+
+    public void printAndResetCounters() {
+        log.info("p99.9 {},      p99.99 {},         p100 {}, counter {}",
+                histogram.getValueAtPercentile(99.9),
+                histogram.getValueAtPercentile(99.99),
+                histogram.getValueAtPercentile(100), histogram.getTotalCount());
+        histogram.reset();
     }
 
     public void sendTestReq() {

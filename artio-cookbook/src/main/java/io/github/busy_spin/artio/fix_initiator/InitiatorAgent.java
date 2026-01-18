@@ -16,7 +16,7 @@ public class InitiatorAgent implements Agent {
     private long lastReqSendTime = System.currentTimeMillis();
     private long lastConnectAttemptTime = System.currentTimeMillis();
 
-    private final int connectInternalMs = 5_000;
+    private final int hosueKeepIntervalMs = 5_000;
     private final int reqPerMs = Integer.getInteger("artio.request.per.ms");
     private long reqCounter = 0;
 
@@ -45,8 +45,10 @@ public class InitiatorAgent implements Agent {
     public int doWork() throws Exception {
         fixLibrary.poll(10);
         long currentTimeMs = System.currentTimeMillis();
-        if (lastConnectAttemptTime + connectInternalMs < currentTimeMs) {
+        if (lastConnectAttemptTime + hosueKeepIntervalMs < currentTimeMs) {
             handler.tryConnect();
+            handler.printAndResetCounters();
+            lastConnectAttemptTime = currentTimeMs;
         }
         if (lastReqSendTime == currentTimeMs) {
             handler.sendTestReq();
