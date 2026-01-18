@@ -114,9 +114,6 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     }
 
     public void sendTestReq() {
-        if (reply != null) {
-            return;
-        }
         if (session != null && session.isConnected()) {
             testRequestEncoder.testReqID(String.valueOf(System.currentTimeMillis()).toCharArray());
             session.trySend(testRequestEncoder);
@@ -127,6 +124,7 @@ public class FixTestRequestHandler implements SessionHandler, LibraryConnectHand
     public void onTimeout(int libraryId, Session session) {
         log.info("Session timed out");
         reply = errorReply();
+        this.session = null;
     }
 
     @Override
